@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swampmath - will a swamp cooler even work here?</title>
+<style>
+:root{--bg:#0d1117;--card:#141b24;--ink:#e8eef5;--mut:#93a3b5;--amber:#7ee0c3;--line:#24313f}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;padding:40px 16px 70px}
+main{max-width:760px;margin:0 auto}
+.tag{color:var(--amber);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:44px;line-height:1.1;margin:10px 0 14px}
+h1 span{color:var(--amber)}
+.lede{font-size:20px;color:var(--mut);margin-bottom:26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px}
+h2{font-size:20px;margin-bottom:10px}
+li{margin:8px 0 8px 20px}
+.cta{display:inline-block;background:var(--amber);color:#0d1410;font-weight:700;font-size:18px;padding:14px 30px;border-radius:12px;text-decoration:none;margin-top:8px}
+.cta:hover{filter:brightness(1.1)}
+.small{color:var(--mut);font-size:14px;margin-top:26px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.mini{background:#0f141b;border:1px solid var(--line);border-radius:10px;padding:14px}
+.mini b{color:var(--amber)}
+</style>
+</head>
+<body>
+<main>
+<div class="tag">The problem</div>
+<h1>A swamp cooler in Miami is a <span>$400 humidifier</span>.</h1>
+<p class="lede">Evaporative coolers are miracles in the desert and furniture in the humidity - and the box will not tell you which one you are buying. The physics is one number: your wet-bulb depression. Swampmath computes it from your temperature and humidity, then shows the air the cooler can actually deliver.</p>
+<a class="cta" href="app.html">Check your air</a>
+
+<div class="card" style="margin-top:26px">
+<h2>What it computes</h2>
+<div class="grid2">
+<div class="mini"><b>Wet bulb</b><br>The coldest temperature evaporation can reach in your air (Stull approximation, the standard published formula).</div>
+<div class="mini"><b>The depression</b><br>Outside temp minus wet bulb. That gap is your entire cooling budget - no cooler beats it.</div>
+<div class="mini"><b>Honest supply air</b><br>Real coolers close 65-90% of the gap (the published effectiveness range for direct evaporative media). See the exact supply temperature and the humidity it adds.</div>
+<div class="mini"><b>The verdict</b><br>11&deg;C+ of depression: buy with confidence. 6-11&deg;C: it takes the edge off, nothing more. Under 6&deg;C: save your money.</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Why the box lies by omission</h2>
+<ul>
+<li><b>"Cools up to 20 degrees!"</b> - in Phoenix at 10% humidity. The same unit in Houston at 70% has a physics ceiling of about 4&deg;C before its own effectiveness losses.</li>
+<li><b>Cooling and humidifying are the same process here.</b> The cooler lowers temperature only by raising humidity. In a muggy climate it makes the room feel worse, not better.</li>
+<li><b>Effectiveness is not on the sticker.</b> Basic pads close ~65% of the depression, rigid media ~80%. Two coolers in the same store can differ by a third of their real output.</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>Who it is for</h2>
+<ul>
+<li>Anyone staring at a swamp cooler listing in a humid climate</li>
+<li>Desert dwellers checking whether a basic pad unit is enough</li>
+<li>Garage, workshop and patio owners weighing a cooler against a portable AC</li>
+<li>Landlords fielding "why is the air sticky" complaints</li>
+</ul>
+</div>
+
+<p class="small">Estimation tool: wet bulb via the Stull (2011) approximation (published for -20 to 50&deg;C, 5-99% RH), dew point via August-Roche-Magnus, sea-level pressure assumed. Room temperature never reaches supply temperature - infiltration, walls and people add heat. Verdict bands are common guidance, not standards.</p>
+</main>
+</body>
+</html>

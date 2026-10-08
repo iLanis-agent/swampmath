@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Swampmath - will a swamp cooler even work here?</title>
+<style>
+:root{--bg:#0d1117;--card:#141b24;--ink:#e8eef5;--mut:#93a3b5;--amber:#7ee0c3;--line:#24313f;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:26px 14px 60px}
+main{max-width:860px;margin:0 auto}
+a.back{color:var(--mut);text-decoration:none;font-size:14px}
+h1{font-size:30px;margin:6px 0 2px}h1 span{color:var(--amber)}
+.sub{color:var(--mut);margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.card h2{font-size:19px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+label{display:block;color:var(--mut);font-size:13px;margin-bottom:4px}
+input,select{width:100%;background:#0f141b;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font-size:16px}
+button.ghost{background:#1a2531;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:14px;cursor:pointer;margin:10px 6px 0 0}
+button.ghost:hover{border-color:var(--amber)}
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+.vc{background:#0f141b;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.vc .k{color:var(--mut);font-size:12px;letter-spacing:1px}
+.vc .n{font-size:24px;font-weight:700;margin:4px 0}
+.vc .h{color:var(--mut);font-size:13px}
+.vc.ok .n{color:var(--ok)}.vc.warn .n{color:var(--warn)}.vc.bad .n{color:var(--bad)}
+.note{color:var(--mut);font-size:13px;margin-top:10px}
+.err{display:none;background:#3a1220;border:1px solid var(--bad);color:#fecaca;border-radius:10px;padding:12px 14px;margin-bottom:14px}
+#thermo{width:100%;display:block;margin:14px auto 0}
+.bigverdict{border-radius:12px;padding:16px 18px;font-size:19px;font-weight:700;margin-top:14px;border:1px solid}
+.bigverdict.great{background:#0f2b1c;border-color:var(--ok);color:var(--ok)}
+.bigverdict.warn{background:#2a2113;border-color:var(--warn);color:var(--warn)}
+.bigverdict.bad{background:#3a1220;border-color:var(--bad);color:var(--bad)}
+.bigverdict small{display:block;font-weight:400;font-size:14px;color:var(--ink);margin-top:4px;opacity:.85}
+</style>
+</head>
+<body>
+<main>
+<a class="back" href="index.html">&larr; Swampmath</a>
+<h1>Swamp<span>math</span></h1>
+<p class="sub">Physics decides before you spend. Everything updates live.</p>
+
+<div class="err" id="err"></div>
+
+<div class="card">
+<h2>1. Your air right now</h2>
+<div class="grid">
+<div><label>Outside temp (&deg;C)</label><input id="temp" type="number" step="any" value="35"></div>
+<div><label>Relative humidity (%)</label><input id="rh" type="number" step="any" value="20"></div>
+<div><label>Cooler effectiveness</label><select id="eff">
+<option value="65">Basic pads - ~65%</option>
+<option value="80" selected>Rigid media, typical - ~80%</option>
+<option value="90">Best case - ~90%</option>
+</select></div>
+</div>
+<button class="ghost" id="pPhoenix">Phoenix 41&deg;C / 15%</button>
+<button class="ghost" id="pTelAviv">Tel Aviv 33&deg;C / 65%</button>
+<button class="ghost" id="pMiami">Miami 34&deg;C / 70%</button>
+<button class="ghost" id="pDenver">Denver 32&deg;C / 30%</button>
+<p class="note">Effectiveness is the published typical saturation range for direct evaporative media (65-90%); the box sticker almost never says which.</p>
+</div>
+
+<div class="card">
+<h2>2. The physics ceiling</h2>
+<div class="verdicts">
+<div class="vc"><div class="k">WET BULB</div><div class="n" id="vTw">-</div><div class="h">the coldest water evaporation can reach</div></div>
+<div class="vc"><div class="k">DEW POINT</div><div class="n" id="vTd">-</div><div class="h">where condensation starts</div></div>
+<div class="vc"><div class="k">DEPRESSION</div><div class="n" id="vDep">-</div><div class="h">temp minus wet bulb: your cooling budget</div></div>
+</div>
+<svg id="thermo" viewBox="0 0 860 170" role="img" aria-label="Temperature ladder"></svg>
+</div>
+
+<div class="card">
+<h2>3. What the cooler actually delivers</h2>
+<div class="verdicts">
+<div class="vc ok"><div class="k">SUPPLY AIR</div><div class="n" id="vSupply">-</div><div class="h" id="vSupplyH">air leaving the cooler</div></div>
+<div class="vc"><div class="k">TEMP DROP</div><div class="n" id="vDrop">-</div><div class="h">effectiveness x depression</div></div>
+<div class="vc warn"><div class="k">SUPPLY HUMIDITY</div><div class="n" id="vSupplyRH">-</div><div class="h">evaporation adds moisture back</div></div>
+</div>
+<div class="bigverdict" id="vVerdict"></div>
+<p class="note">Verdict bands are common guidance, not standards: a wet-bulb depression of 11&deg;C+ is swamp cooler territory, 6-11&deg;C is marginal, under 6&deg;C a fan or AC serves you better. Room temperature never reaches supply temperature - infiltration, walls and people all add heat.</p>
+</div>
+
+</main>
+<script src="engine.js?v=1"></script>
+<script>
+const $ = id => document.getElementById(id);
+function drawThermo(t, td, tw, supply) {
+  const svg = $('thermo');
+  const lo = Math.min(td, supply, tw) - 4, hi = t + 4;
+  const X = v => 60 + (v - lo) / (hi - lo) * 740;
+  const esc = s => String(s).replace(/</g,'&lt;');
+  const mark = (v, y, color, label, val) => `
+    <line x1="${X(v)}" y1="${y-12}" x2="${X(v)}" y2="${y+12}" stroke="${color}" stroke-width="3"/>
+    <text x="${X(v)}" y="${y-18}" fill="${color}" font-size="13" font-weight="700" text-anchor="middle">${esc(label)}</text>
+    <text x="${X(v)}" y="${y+30}" fill="${color}" font-size="12" text-anchor="middle">${esc(val)}</text>`;
+  svg.innerHTML = `
+    <line x1="60" y1="85" x2="800" y2="85" stroke="#24313f" stroke-width="6" stroke-linecap="round"/>
+    ${mark(t, 85, '#f87171', 'outside', Swamp.fmt(t)+'°C')}
+    ${mark(tw, 85, '#7ee0c3', 'wet bulb', Swamp.fmt(tw)+'°C')}
+    ${mark(supply, 85, '#4ade80', 'supply air', Swamp.fmt(supply)+'°C')}
+    ${mark(td, 85, '#93a3b5', 'dew point', Swamp.fmt(td)+'°C')}`;
+}
+function calc() {
+  const err = $('err');
+  const t = +$('temp').value, rh = +$('rh').value, eff = +$('eff').value;
+  if (!isFinite(t) || t < -20 || t > 55 || !isFinite(rh) || rh < 1 || rh > 100) {
+    err.style.display = 'block';
+    err.textContent = 'Check the numbers: temperature -20 to 55 C and humidity 1-100% (the wet-bulb approximation is published for RH 5-99%, T -20 to 50 C).';
+    return;
+  }
+  err.style.display = 'none';
+  const c = Swamp.cooler(t, rh, eff);
+  $('vTw').textContent = Swamp.fmt(c.tw) + '°C';
+  $('vTd').textContent = Swamp.fmt(c.td) + '°C';
+  $('vDep').textContent = Swamp.fmt(c.depression) + '°C';
+  $('vSupply').textContent = Swamp.fmt(c.supplyT) + '°C';
+  $('vSupplyH').textContent = Swamp.fmt(Swamp.cToF(c.supplyT), 0) + '°F supply air';
+  $('vDrop').textContent = Swamp.fmt(c.drop) + '°C';
+  $('vSupplyRH').textContent = Swamp.fmt(c.supplyRH, 0) + '%';
+  const v = $('vVerdict');
+  v.className = 'bigverdict ' + c.band;
+  v.innerHTML = c.verdict + '<small>Wet bulb ' + Swamp.fmt(c.tw) + '°C is the physics floor for ' + Swamp.fmt(t) + '°C at ' + Swamp.fmt(rh,0) + '% humidity. A ' + eff + '%-effective cooler closes ' + Swamp.fmt(c.drop) + ' of the ' + Swamp.fmt(c.depression) + '°C depression - and pushes the supply air to ~' + Swamp.fmt(c.supplyRH,0) + '% humidity doing it.</small>';
+  drawThermo(t, c.td, c.tw, c.supplyT);
+}
+const presets = { pPhoenix: [41, 15], pTelAviv: [33, 65], pMiami: [34, 70], pDenver: [32, 30] };
+Object.entries(presets).forEach(([id, [t, r]]) => $(id).addEventListener('click', () => { $('temp').value = t; $('rh').value = r; calc(); }));
+['temp','rh','eff'].forEach(id => $(id).addEventListener('input', calc));
+calc();
+</script>
+</body>
+</html>

@@ -38,8 +38,8 @@ def cooler(t, rh, eff):
             'humidityRatio': 0.622 * psat(td) / (P - psat(td))}
 
 cases = []
-grid_t = [-10, 0, 10, 20, 25, 30, 35, 40, 45]
-grid_rh = [5, 15, 30, 50, 70, 85, 99]
+grid_t = [-10, 5, 20, 25, 35, 45]
+grid_rh = [5, 20, 50, 80, 99]
 for t in grid_t:
     for rh in grid_rh:
         for eff in [65, 80, 90]:
@@ -54,5 +54,5 @@ for t in [5, 15, 25, 35]:
                       'expected': {'td': td, 'psatAtTd': psat(td), 'pVapor': p_vapor}})
 
 with open('expected.json', 'w') as f:
-    json.dump({'cases': cases}, f, indent=1)
+    json.dump({'cases': cases}, f, separators=(',', ':'))
 print(f'{len(cases)} cases written')
